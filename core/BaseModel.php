@@ -201,8 +201,9 @@ class BaseModel
 			(
 				`id` INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				`day` DATE NOT NULL ,
+				`all_price` INT(10) NOT NULL,
 				`price` FLOAT(10) NOT NULL ,
-				`expenditure` VARCHAR(10) NOT NULL  
+				`expenditure` FLOAT(10) NOT NULL  
 			)
 				ENGINE = InnoDB 
 				CHARSET= utf8 COLLATE utf8_general_ci;
@@ -211,78 +212,71 @@ class BaseModel
 	}
 
 
+	/*
+	ALTER TABLE Day ADD COLUMN all_price INT(10) NOT NULL AFTER day;
 
+
+	*/
 	/*================== МЕТОДЫ ДЛЯ ТАБЛИЦ Day,Buy ===============*/
 
 	/* Внесение записи в таблицу Buy, подсчет всех записей в Buy по вносимой дате 
 	и внесение этой стоимости в таблицу Day */
 	public static function insertBuy($post)
 	{
-		/*self::d($post);
-		echo "<hr>";*/
-
-
 		//Внести данные в таблицу Buy о покупке
 		self::insert($post);
 
 		/* Выбрать данные все данные обо всех записях в у которых совпадает день,
 		посчитать и записать поле price в переменную $count для всех записей по такой дате */
+		$count = 0;
+		$expenditure = 0;
 		$day = $_POST['day'];
 		$sql = "SELECT * FROM `Buy` WHERE day = '{$day}'";
-		$count = 0;
 		$result = self::$pdo->query($sql);
 		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) 
 		{
 			$array[] = $row;
-			$count = $count + ($row['price'] * $row['count']);
+			if ($row['expenditure'] == 'yes') {
+				$count = $count + ($row['price'] * $row['count']);
+			}elseif($row['expenditure'] == 'no'){
+				$expenditure = $expenditure + ($row['price'] * $row['count']);
+			}
 		}
-
-		echo "<hr>";
-		self::d($array);
-		echo "<hr>";
-		echo $count;
-		echo "<hr>";
 
 		/* запрос select для проверки есть ли запись в таблице Day по такой дате 
 		если есть то обновить если нет то создать новую запись */
+		$all_price = 0;
 		$sql = "SELECT * FROM `Day` WHERE day = '{$day}'";
-		//$sql = "SELECT * FROM `Day` WHERE day = '2019-05-24'";
 		$result = self::$pdo->query($sql);
 		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) 
 		{
 			$arr[] = $row;
+			$all_price = $row['all_price'];
 		}
-		var_dump($arr);
-
 
 		/* Если == null то выполнить операцию INSERT, если нет то выполнить UPDATE */
 		if ($arr == null) {
 
-			$sql = "INSERT INTO `Day` VALUES (null, '{$day}', '{$count}', 1)";
+			$all_price = $count + $expenditure;
+			$sql = "INSERT INTO `Day` VALUES (null, '{$day}', '{$all_price}', '{$count}', '{$expenditure}')";
 			$result = self::$pdo->exec($sql);
-			echo "-";
-
 		}else{
 			echo $count;
-			echo $allCount = $count + $_POST['price'];
-			$sql = "UPDATE `Day` SET price ='{$count}' WHERE day = '{$day}'";
+			echo $expenditure;
+			echo $all_price;
+			$all_price = $count + $expenditure;
+
+			$sql = "UPDATE `Day` SET 
+				all_price = '{$all_price}', 
+				price = '{$count}', 
+				expenditure = '{$expenditure}' 
+				WHERE day = '{$day}'";
 			$result = self::$pdo->exec($sql);
-			echo "+";
-
 		}
-
-/*
-		echo "<hr>";
-		self::d($array);
-		var_dump($array);*/
-		
-		//$res = self::$pdo->exec($sql);
-/*
-		$day = $_POST['day'];
-		$price = $_POST['price'];
-		$sql = "INSERT INTO `Day` VALUES (null, '{$day}', '{$count}', 1)";
-		$res = self::$pdo->exec($sql);*/
 	}
+
+
+
 
 
 	/* Удаление записи из таблицы Buy, и перерасчет поля price для таблицы Day */
@@ -300,10 +294,6 @@ class BaseModel
 			$count += $row['price'];
 		}
 
-
-
-
-
 		echo "<hr>";
 		echo $sql;
 		echo "<hr>";
@@ -312,22 +302,6 @@ class BaseModel
 		echo $count;
 		echo "<hr>";
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	/*================== МЕТОДЫ СИСТЕМЫ CRUD Insert/Selet/Delete/Update ===============*/

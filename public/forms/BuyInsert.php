@@ -1,6 +1,6 @@
 <?php 
-$date = getdate();
-$today = $date['year'].'-'.$date['mon'].'-'.$date['mday'];
+
+
 ?>
 
 <form action="" method="post">
@@ -8,10 +8,10 @@ $today = $date['year'].'-'.$date['mon'].'-'.$date['mday'];
 	<input type="hidden" name="table" value="Buy">
 	<input type="hidden" name="id" value="null">
 
-	<h4>Внести данныен о покупке</h4>
+	<h4>Внести данные о покупке</h4>
 	<p>
 		<label for="day">Введите день в формате (2019-7-12):</label><br>
-		<input type="text" name="day" value=<?php echo "$today"; ?>>
+		<input type="text" name="day" value=<?php $this->getToday(); ?>>
 	</p>
 
 	<p>
@@ -35,7 +35,7 @@ $today = $date['year'].'-'.$date['mon'].'-'.$date['mday'];
 	</p>
 
 	<p>
-		<label for="expenditure">Это стоило покупать ?</label><br>
+		<label for="expenditure">Это стоило покупать ?</label>
 		<select name="expenditure">
 			<option>yes</option>
 			<option>no</option>
@@ -43,7 +43,7 @@ $today = $date['year'].'-'.$date['mon'].'-'.$date['mday'];
 	</p>
 
 	<p>
-		<input type="submit" name="Buy_insert">
+		<button name="Buy_insert">Готово</button>
 	</p>
 </form>
 

@@ -15,6 +15,12 @@ class CrudController
 		require_once 'public/BuyHeader.php';
 	}
 
+	/* Главная страница для контроллера CrudController содержит общую информацию */
+	public function indexAction()
+	{
+
+	}
+
 	/* Фрма для отправки SQL запросса INSERT */
 	public function insertAction()
 	{
@@ -34,6 +40,13 @@ class CrudController
 	{
 		require_once 'public/forms/BuyDelete.php';
 		$this->formExecute();
+	}
+
+	/* Функцция выводит текущую дату в формате : 2019-5-14 */
+	public function getToday()
+	{
+		$date = getdate();
+		echo $today = $date['year'].'-'.$date['mon'].'-'.$date['mday'];
 	}
 
 	/* Прверка нажатия кнопки отправки формы */

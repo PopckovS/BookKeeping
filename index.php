@@ -18,27 +18,8 @@ spl_autoload_register(function($class){
 });
 
 new Errors('index.php?','public/errors/');
-?>
 
+require_once 'public/default.php';
 
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-    <title>BookKeeping</title>
-    <meta charset="utf-8"/>
-    <link rel="stylesheet" type="text/css" href="public/style.css" >   
-</head>   
-<body>
-
-<h1>ШАБЛОН</h1><hr>
-<?php 
-	require_once 'public/header.php';
-	// Создание обьекта класса Роутера и передача ему всех переменных типа $_GET 
-	Router::dispatch($_SERVER['QUERY_STRING']); 
-?>
-<hr><h1>КОНЕЦ ШАБЛОН</h1>
-
-</body>
-</html>
 
 

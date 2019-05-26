@@ -1,9 +1,15 @@
-<hr>
-<a href="index.php?method=crud&action=insert">Crud-insert</a><br>
-<hr>
+<ul>
+	<li><a href="index.php?method=crud&action=insert">Внести данные о покупке</a></li>
+	<li><a href="index.php?method=crud&action=delete">Удалить данные о покупке</a></li>
+	<li><a href="index.php?method=crud&action=update">Изменить данные о покупке</a></li>
+</ul> 
 
-<a href="index.php?method=crud&action=delete">Crud-delete</a><br>
-<hr>
-
-<a href="index.php?method=crud&action=update">Crud-update</a><br>
-<hr>
+<style type="text/css">
+	ul li a{
+		color: #1A151D;
+		text-decoration:none;
+	}
+	ul li a:hover{
+		color: #EA6917;
+	}
+</style>

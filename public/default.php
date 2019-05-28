@@ -53,6 +53,7 @@
     text-decoration:underline;
   }
   #content{
+    padding-top: 20px;
     float: left;
     border-radius: 6px;
     background-color: white;

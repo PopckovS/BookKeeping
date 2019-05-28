@@ -39,6 +39,26 @@ class BaseModel
 
 
 /*=============================== БАЗОВЫЕ МЕТОДЫ КЛАССА =========================*/
+	
+
+
+
+	// Простой запрос типа SELECT
+	public static function simpleSelect($sql)
+	{
+		BaseModel::connection();
+		$result = self::$pdo->query($sql);
+		$count = 0;
+
+		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+			$array[] = $row;
+			$count ++;
+		}
+
+		return ['sql' => $sql, 'result' => $count, 'array' => $array];
+	}
+
+
 
 	// Вывести содержимое
 	public static function d($array)
@@ -47,11 +67,13 @@ class BaseModel
 	}
 
 
+
 	// Возвращает Асоц Массив из полей указаной таблицы Назв.Поля и Тип.Поля / Для любого режима работы
 	public static function getFields(string $table):array
 	{
 		return self::doReturn('SHOW COLUMNS FROM '.$table, 'ASSOC');
 	}
+
 
 
 	// Получить Список всех таблиц в БД / Для обычного режима работы
@@ -72,7 +94,7 @@ class BaseModel
 	*/
 	public static function doReturn(string $query, string $fetch = 'NUM', string $nesting = 'two'):array
 	{
-		$result = self::$pdo->query($query);
+		 $result = self::$pdo->query($query);
 		switch ($fetch)
 		{
 			case 'ASSOC':
@@ -464,7 +486,7 @@ class BaseModel
 	public static function select($post)
 	{
 		BaseModel::connection();
-		$sql = self::preSelect($post);
+		echo $sql = self::preSelect($post);
 		$result = self::$pdo->query($sql);
 		$count = 0;
 
@@ -472,8 +494,6 @@ class BaseModel
 			$array[] = $row;
 			$count ++;
 		}
-
-		self::d($array);
 
 		return ['sql' => $sql, 'result' => $count, 'mass' => $array, 'fields' => self::$fields];
 	}

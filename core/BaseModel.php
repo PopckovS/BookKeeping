@@ -40,11 +40,9 @@ class BaseModel
 
 /*=============================== БАЗОВЫЕ МЕТОДЫ КЛАССА =========================*/
 	
-
-
-
+		
 	// Простой запрос типа SELECT
-	public static function simpleSelect($sql)
+	public static function simpleSelect($sql, $table)
 	{
 		BaseModel::connection();
 		$result = self::$pdo->query($sql);
@@ -55,7 +53,9 @@ class BaseModel
 			$count ++;
 		}
 
-		return ['sql' => $sql, 'result' => $count, 'array' => $array];
+		$fields = self::getFields($table);
+
+		return ['sql' => $sql, 'result' => $count, 'mass' => $array, 'fields' => $fields];
 	}
 
 
@@ -179,18 +179,20 @@ class BaseModel
 		return $result;
 	}
 
-/*=============================== Методы создания таблиц =========================*/
+/*=============================== Методы создания таблиц и Базы Данных =========================*/
 	
 	//
 	public static function dropBuy()
 	{
-		$result = self::$pdo->query("DROP TABLE `Buy`");
+		$sql = "DROP TABLE `Buy`";
+		$result = self::$pdo->query($sql);
 	}
 
 	//
 	public static function dropDay()
 	{
-		$result = self::$pdo->query("DROP TABLE `Day`");
+		$sql = "DROP TABLE `Day`";
+		$result = self::$pdo->query($sql);
 	}
 
 
@@ -222,7 +224,7 @@ class BaseModel
 			"CREATE TABLE `BookKeeping`.`Day` 
 			(
 				`id` INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-				`day` DATE NOT NULL ,
+				`day_date` DATE NOT NULL ,
 				`all_price` INT(10) NOT NULL,
 				`price` FLOAT(10) NOT NULL ,
 				`expenditure` FLOAT(10) NOT NULL  
@@ -236,16 +238,90 @@ class BaseModel
 
 	/*
 	ALTER TABLE Day ADD COLUMN all_price INT(10) NOT NULL AFTER day;
-
-
+	"SELECT all_price FROM `Day` WHERE all_price != 0 " Выборка где не равно = 0
 	*/
+
+	/* Выборка всех цен за все даты 
+	Вызвать метод countAverage 
+	ввернуть результат*/
+	public static function averageAllCount()
+	{
+		BaseModel::connection();
+		$sql = "SELECT all_price FROM `Day` WHERE all_price > 100 ";
+		$result = self::$pdo->query($sql);
+		$count = 0;
+
+		while ($row = $result->fetch(\PDO::FETCH_NUM)) 
+		{
+			$array[] = $row[0];
+			$count ++;
+		}
+		//self::d($array);
+		//var_dump($array);
+
+		if ($array == null) {
+			return 0; 
+		}else{
+			return self::countAverage($array); 
+		}	
+	}
+
+    /*========================== Эта функция неработает пока ! =======================*/
+	/* Выборка цен между введенными датами 
+	Вызвать метод countAverage 
+	ввернуть результат*/
+	public static function averageAllCountBetween()
+	{
+		BaseModel::connection();
+
+		$from = '2019-05-24';
+		$to = '2019-05-26';
+
+
+		$sql = "SELECT all_price FROM `Day` WHERE day_date BETWEEN '{$from}' AND '{$to}'"; 
+
+		$result = self::$pdo->query($sql);
+		$count = 0;
+
+		while ($row = $result->fetch(\PDO::FETCH_NUM)) 
+		{
+			$array[] = $row[0];
+			$count ++;
+		}
+
+		if ($array == null) {
+			return 0; 
+		}else{
+			return self::countAverage($array); 
+		}
+	}
+
+
+	/* @param array массив с общими ценами всех покупок за введенные даты
+	посчитать и вернуть среднее значение трат */
+	public static function countAverage(array $array): float
+	{
+		$count = count($array);
+		$delitel = 0;
+		for ($i=0; $i < $count; $i++) 
+		{ 
+			$float += $array[$i];
+			$delitel ++;
+		}
+
+		$result = ($float/$delitel);
+		return intval($result*100)/100;
+	}
+
+
+	
 	/*================== МЕТОДЫ ДЛЯ ТАБЛИЦ Day,Buy ===============*/
 
 	/* Внесение записи в таблицу Buy, подсчет всех записей в Buy по вносимой дате 
 	и внесение этой стоимости в таблицу Day */
 	public static function insertBuy($post)
 	{
-		//Внести данные в таблицу Buy о покупке
+		//Внести данные в таблицу Buy о покупке, это стандартная функция описана ниже.
 		self::insert($post);
 
 		/* Выбрать данные все данные обо всех записях в у которых совпадает день,
@@ -268,7 +344,7 @@ class BaseModel
 		/* запрос select для проверки есть ли запись в таблице Day по такой дате 
 		если есть то обновить если нет то создать новую запись */
 		$all_price = 0;
-		$sql = "SELECT * FROM `Day` WHERE day = '{$day}'";
+		$sql = "SELECT * FROM `Day` WHERE day_date = '{$day}'";
 		$result = self::$pdo->query($sql);
 		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) 
 		{
@@ -301,10 +377,19 @@ class BaseModel
 
 
 
-	/* Удаление записи из таблицы Buy, и перерасчет поля price для таблицы Day */
+	/* Удаление записи из таблицы Buy, и перерасчет поля price для таблицы Day 
+	Данный метод является обертко для метода preDelete а не delete как у метода insertBuy */
 	public static function deleteBuy($post)
 	{
-		self::delete($post);
+		/**/
+		BaseModel::connection();
+		$sql = self::preDelete($post);
+		var_dump($sql);
+		//$result = self::$pdo->exec($sql);
+		//return ['sql' => $sql, 'result' => $result];
+		/**/
+		
+		die();
 
 		$day = $_POST['day'];
 		$sql = "SELECT * FROM `Buy` WHERE day = '{$day}'";
@@ -316,6 +401,8 @@ class BaseModel
 			$count += $row['price'];
 		}
 
+		//self::delete($post);// Удаляю запись из таблицы Buy
+
 		echo "<hr>";
 		echo $sql;
 		echo "<hr>";
@@ -324,6 +411,7 @@ class BaseModel
 		echo $count;
 		echo "<hr>";
 	}
+
 
 
 	/*================== МЕТОДЫ СИСТЕМЫ CRUD Insert/Selet/Delete/Update ===============*/
@@ -339,7 +427,6 @@ class BaseModel
 	// Внести данные в Любую таблицу 
 	protected static function preInsert($post)
 	{
-		//$fields = self::getFields($post['table'], $post['action']);
 
 		//var_dump($post['table']);
 		$fields = self::getFields($post['table']);
@@ -385,99 +472,7 @@ class BaseModel
 
 
 
-	// Конструктор запросов для типа DELETE
-	public static function delete($post)
-	{	
-		BaseModel::connection();
-		$sql = self::preDelete($post);
-		$result = self::$pdo->exec($sql);
-		return ['sql' => $sql, 'result' => $result];
-	}
 
-	// Удаление данные из Любой таблицы по любым полям
-	protected static function preDelete($post)
-	{
-		//$fields = self::getFields($post['table'], $post['action']);
-		$fields = self::getFields($post['table']);
-
-		$sql = "DELETE FROM `{$post['table']}` WHERE ";
-
-		$keys = array_keys($post);
-		$count = count($fields);
-		
-		$count_y = count($keys);
-		$countPost = count($post);
-
-
-		// Удалить из массива $post все значения == ''
-		for ($i=0; $i < $countPost; $i++) 
-		{ 
-			if ($post[$keys[$i]] == '') {
-				$names[] = $keys[$i];
-				unset($post[$keys[$i]]);
-			}
-		}
-		// Удалить из массива $fields все эллементы у которых нету аналогов из массива $post
-		$countName = count($names);
-		for ($i=0; $i < $count; $i++) 
-		{ 
-			for ($y=0; $y < $countName; $y++) 
-			{ 
-				if ($fields[$i]['Field'] == $names[$y]) {
-					unset($fields[$i]);
-				}
-			}
-		}
-
-		foreach ($fields as $key) {
-			$mass[] = $key;
-		}
-		$fields = $mass;
-
-
-
-
-		$fields = self::clear($fields);
-
-		$count_i = count($fields);
-		for ($i=0; $i < $count; $i++) 
-		{ 
-			echo $fields[$i]['Type'];
-			if ($fields[$i]['Type'] == 'int') 
-			{
-				
-				$sql .= " {$fields[$i]['Field']} = ";
-
-				for ($y=0; $y < $count_y; $y++) { 
-					if ($keys[$y] == $fields[$i]['Field']) 
-					{
-						$sql .= " {$post[$keys[$y]]} ";
-					}
-				}
-
-			}elseif($fields[$i]['Type'] == 'varchar'){
-				$sql .= " {$fields[$i]['Field']} = ";
-
-				for ($y=0; $y < $count_y; $y++) { 
-					if ($keys[$y] == $fields[$i]['Field']) 
-					{
-						$sql .= " '{$post[$keys[$y]]}' ";
-					}
-				}
-			}
-
-
-			if ($count_i != 1) {
-				$sql .= " AND ";
-				$count_i --;
-			}
-		}
-
-		$sql .=" ;";
-
-		return $sql;
-	}
-	
 
 
 
@@ -486,7 +481,7 @@ class BaseModel
 	public static function select($post)
 	{
 		BaseModel::connection();
-		echo $sql = self::preSelect($post);
+		$sql = self::preSelect($post);
 		$result = self::$pdo->query($sql);
 		$count = 0;
 
@@ -502,7 +497,6 @@ class BaseModel
 	// Удаление данные из Любой таблицы по любым полям
 	protected static function preSelect($post)
 	{
-		//$fields = self::getFields($post['table'], $post['action']);
 		$fields = self::getFields($post['table']);
 
 		if ($post['type_select'] == 'all') {
@@ -629,122 +623,5 @@ class BaseModel
 
 	
 
-
-	// Конструктор запросов для типа UPDATE
-	public static function update($post)
-	{
-		BaseModel::connection();
-		$sql = self::preUpdate($post);
-		$result = self::$pdo->exec($sql);
-
-		return ['sql' => $sql, 'result' => $result];
-	}
-
-
-	// Изменение любой записи в Таблице
-	protected static function preUpdate($post)
-	{
-		//$fields = self::getFields($post['table'], $post['action']);
-		$fields = self::getFields($post['table']);
-
-		$sql = "UPDATE `{$post['table']}` SET ";
-
-		//Очистка $fields от пустых значений
-			$keys = array_keys($post);
-			$countPost = count($post);
-			// Удалить из массива $post все значения == ''
-			for ($i=0; $i < $countPost; $i++) 
-			{ 
-				if ($post[$keys[$i]] == '') {
-					$names[] = $keys[$i];
-					unset($post[$keys[$i]]);
-				}
-			}
-
-		// BВзять из массива $post элементы и создать массив $SET
-			$keys = array_keys($post);
-			$countKeys = count($keys);
-			for ($i=0; $i < $countKeys; $i++) 
-			{ 
-				if (strstr($keys[$i], 'set_')) 
-				{
-					$set[] = str_replace('set_', '', $keys[$i]);
-				}
-			}
-
-		// BВзять из массива $post элементы и создать массив $WHERE
-			$keys = array_keys($post);
-			$countKeys = count($keys);
-			for ($i=0; $i < $countKeys; $i++) 
-			{ 
-				if (strstr($keys[$i], 'where_')) 
-				{
-					$where[] = str_replace('where_', '', $keys[$i]);
-				}
-			}
-
-
-		$fields = self::clear($fields);
-
-		// SET
-		$countFields = count($fields);
-		$countSelect = count($set);
-		$count_i = count($set);//
-		for ($i=0; $i < $countFields; $i++) 
-		{
-
-			for ($y=0; $y < $countFields; $y++) 
-			{ 
-				if ($set[$i] == $fields[$y]['Field']) 
-				{
-					$s = $post['set_'.$fields[$y]['Field']];
-
-					if ('varchar' == $fields[$y]['Type']) {
-						$sql .= " {$fields[$y]['Field']} = '{$s}'";
-					}elseif('int' == $fields[$y]['Type']){
-						$sql .= " {$fields[$y]['Field']} = {$s}";
-					}
-				}
-			}
-
-			if ($count_i != 1)
-			{
-				$sql .= ",";
-				$count_i --;
-			}
-		}
-
-		$sql .= " WHERE ";
-
-		// WHERE
-		$countFields = count($fields);
-		$countWhere = count($where);
-		$count_i = count($where);
-
-		for ($i=0; $i < $countWhere; $i++) 
-		{
-			for ($y=0; $y < $countFields; $y++) 
-			{ 
-
-				if ($where[$i] == $fields[$y]['Field']) 
-				{
-					$s = $post['where_'.$fields[$y]['Field']];
-					if ('varchar' == $fields[$y]['Type']) {
-						$sql .= " {$fields[$y]['Field']} = '{$s}'";
-					}elseif('int' == $fields[$y]['Type']){
-						$sql .= " {$fields[$y]['Field']} = {$s}";
-					}
-				}
-			}
-
-			if ($count_i != 1) {
-				$sql .= " AND ";
-				$count_i --;
-				
-			}
-		}
-
-		return $sql;
-	}
 }
 

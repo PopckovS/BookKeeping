@@ -16,8 +16,8 @@ class ShowController
 
 	public function indexAction()
 	{
-	}
 
+	}
 
 
 	public function selectAction()
@@ -30,20 +30,25 @@ class ShowController
 			extract($result);
 			$countFields = count($fields);
 
+
 			getExcel($mass);// Функция вывода данных в файл
+
 			/* Подключение вывода запрошенных данных результатов в виде таблицы*/
 			require_once 'public/table.php';
-		   
 		}
 	}
 
-	
 
 	/* Выбрать все из таблицы Покупки */
 	public function getAllFromBuyAction()
 	{
 		$sql = 'SELECT * FROM `Buy`';
-		$columns = BaseModel::simpleSelect($sql);
+		$result = BaseModel::simpleSelect($sql, 'Buy');
+		extract($result);
+		$countFields = count($fields);
+
+		getExcel($mass);// Функция вывода данных в файл
+
 		require_once 'public/table.php';
 	}
 
@@ -52,7 +57,12 @@ class ShowController
 	public function getAllFromDayAction()
 	{
 		$sql = 'SELECT * FROM `Day`';
-		$result = BaseModel::simpleSelect($sql);
+		$result = BaseModel::simpleSelect($sql, 'Day');
+		extract($result);
+		$countFields = count($fields);
+
+		getExcel($mass);// Функция вывода данных в файл
+
 		require_once 'public/table.php';
 	}
 

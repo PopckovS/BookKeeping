@@ -8,13 +8,3 @@ return [
 	'PASSWORD' => ''
 ];
 
-
-/*
-return 
-[
-    'HOST' => 'localhost',
-    'DB' => 'id8949168_stepanov',
-	'LOGIN' => 'id8949168_popckov',
-	'PASSWORD' => 'IremOfPilars'
-];
-*/

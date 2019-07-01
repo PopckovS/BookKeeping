@@ -12,8 +12,9 @@ class CrudController
 	/* Загрузка выпадающего меню до отображения конкретной формы*/
 	public function __construct()
 	{
-		require_once 'public/BuyHeader.php';
+
 	}
+
 
 	/* Главная страница для контроллера CrudController содержит общую информацию */
 	public function indexAction()
@@ -21,26 +22,29 @@ class CrudController
 
 	}
 
-	/* Фрма для отправки SQL запросса INSERT */
+
+	// Вывести содержимое
+	public  function d($array)
+	{
+		echo "<pre>".print_r($array,1)."</pre>";
+	}
+
+
+	/* Форма для отправки SQL запросса INSERT */
 	public function insertAction()
 	{
 		require_once 'public/forms/BuyInsert.php';
-		$this->formExecute();
+
+		switch ($_POST['action'])
+		{
+			case 'insert':
+				return BaseModel::insertBuy($_POST);
+			break;
+		}
+		
 	}
 
-	/* Фрма для отправки SQL запросса UPDATE */
-	public function updateAction()
-	{
-		require_once 'public/forms/BuyUpdate.php';
-		$this->formExecute();
-	}
 
-	/* Фрма для отправки SQL запросса DELETE */
-	public function deleteAction()
-	{
-		require_once 'public/forms/BuyDelete.php';
-		$this->formExecute();
-	}
 
 	/* Функцция выводит текущую дату в формате : 2019-5-14 */
 	public function getToday()
@@ -49,21 +53,4 @@ class CrudController
 		echo $today = $date['year'].'-'.$date['mon'].'-'.$date['mday'];
 	}
 
-	/* Прверка нажатия кнопки отправки формы */
-	public function formExecute()
-	{
-		/* $_POST['action'] имеется только если отправлена форма в виде hidden поля */
-		switch ($_POST['action'])
-		{
-			case 'insert':
-				return BaseModel::insertBuy($_POST);
-			break;
-			case 'delete':
-				return BaseModel::deleteBuy($_POST);
-			break;
-			case 'update':
-				return BaseModel::updateBuy($_POST);
-			break;
-		}
-	}
 }

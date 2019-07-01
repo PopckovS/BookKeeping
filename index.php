@@ -65,17 +65,15 @@ function getExcel($array)
   	$name = "tmpExcel/Excel-".$today.".xlsx";
   	$objWriter->save($name);
 
-  	echo "<a href='index.php?filename={$name}'>Скачать в формате файла Excle</a>";
+  	echo "<br><a href='index.php?filename={$name}'>Скачать в формате файла Excle</a>";
 }
 
 
  function getExcelFile()
-	{
-		if ($_GET['filename']) 
-		{
-			
+{
+	if ($_GET['filename']) 
+	{	
 		$name = $_GET['filename'];
-
 		header("Pragma: public"); 
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
@@ -86,13 +84,8 @@ function getExcel($array)
 		header("Content-Length: ".filesize($name)); // необходимо доделать подсчет размера файла по абсолютному пути
 		readfile($name);
 		unlink($name);
-		
-		}
-
-		//header('Location:index.php?method=Show&action=select');
-		
-
 	}
+}
 
 
 function d($array)

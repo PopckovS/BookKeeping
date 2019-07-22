@@ -4,27 +4,34 @@
 	<input type="hidden" name="table" value="Buy">
 	<input type="hidden" name="id" value="null">
 
+    <!-- html Форма для внесения данных в таблицы -->
 	<h4>Внести данные о покупке</h4>
+
+    <!-- Внести дату покупки-->
 	<p>
 		<label for="day">Введите день в формате (2019-7-12):</label><br>
 		<input type="text" name="day" value=<?php $this->getToday(); ?>>
 	</p>
 
+    <!-- Внести Название покупи -->
 	<p>
 		<label for="name">Название покупки :</label><br>
 		<input type="text" name="name">
 	</p>
 
+    <!-- Внести цену покупки -->
 	<p>
 		<label for="price">Цена :</label><br>
 		<input type="text" name="price">
 	</p>
 
+    <!-- Внести Количесво покупок -->
 	<p>
 		<label for="count">Количество :</label><br>
 		<input type="text" name="count" value="1">
 	</p>
 
+    <!-- Внести Место где было куплено -->
 	<p>
 		<label for="place">Место покупки :</label><br>
 		<input type="text" name="place">
@@ -53,6 +60,7 @@
 
 
 <style>
+/* Стили для формы */
 :-moz-placeholder {
     color: #7e7e7e;
 }

@@ -1,3 +1,4 @@
+<!-- Меню основной нафигации по приложению -->
 <ul>
 	<li><a href="index.php?method=main&action=index">Главная</a></li>
 	<li><a href="index.php?method=crud&action=insert">Внести</a></li>

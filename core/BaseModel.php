@@ -2,6 +2,9 @@
 
 namespace core;
 
+/*
+	Основной Класс по работе с БД через систему PDO
+*/
 class BaseModel
 {
 
@@ -14,12 +17,14 @@ class BaseModel
 	public static $login;
 	public static $password;
 
-
+	/* Метод создает соединение с Базой Данных MySQL */
 	public static function connection()
 	{
-		$config = require 'config/ConfigDb.php';
-		extract($config);
+		
+		$config = require 'config/ConfigDb.php';// Получчение констатнт подключения к PDO
+		extract($config);// Создать переменные подключения из массива 
 
+		// Подключаемся через PDO
 		self::$pdo = new \PDO("mysql:host=".$HOST.";dbname=".$DB.";charset=utf8",$LOGIN,$PASSWORD);
 
 		if(!self::$pdo){
@@ -40,8 +45,7 @@ class BaseModel
 
 /*=============================== БАЗОВЫЕ МЕТОДЫ КЛАССА =========================*/
 	
-		
-	// Простой запрос типа SELECT
+	// Простой запрос типа SELECT и вернуть результат в виде Массива
 	public static function simpleSelect($sql, $table)
 	{
 		BaseModel::connection();
@@ -60,7 +64,7 @@ class BaseModel
 
 
 
-	// Вывести содержимое
+	// Вывести содержимое в удобно чит-мом виде
 	public static function d($array)
 	{
 		echo "<pre>".print_r($array,1)."</pre>";
@@ -94,16 +98,16 @@ class BaseModel
 	*/
 	public static function doReturn(string $query, string $fetch = 'NUM', string $nesting = 'two'):array
 	{
-		 $result = self::$pdo->query($query);
+		$result = self::$pdo->query($query);
 		switch ($fetch)
 		{
-			case 'ASSOC':
+			case 'ASSOC': // Вернуть массив в виде ассоциативного
 				while ($row = $result->fetch(\PDO::FETCH_ASSOC))
 				{
 					$array[] = $row;
 				}
 			break;
-			case 'NUM':
+			case 'NUM':// Вернуть массив в числовом виде
 				while ($row = $result->fetch(\PDO::FETCH_NUM))
 				{
 					if ($nesting == 'two') {
@@ -122,7 +126,9 @@ class BaseModel
 	}
 
 
-	// Очистка полей таблицы от нежелательных
+	/* 
+		Не все поля таблицы мне нужны при запросе, этот метод очищает запрос от нежелательных полей
+	*/
 	public static function clearFieldsOf($fields, $delete = [])
 	{
 		$count_i = count($fields);
@@ -139,11 +145,9 @@ class BaseModel
 			}
 		}
 
-
 		foreach ($fields as $key) {
 			$mass[] = $key;
 		}
-
 
 		$count = count($mass);
 		$result = [];
@@ -161,7 +165,8 @@ class BaseModel
 	} 
 
 
-	//
+
+	// Очистить тип поля от скобок
 	public static function clear(array $array): array
 	{
 		$count = count($array);
@@ -181,14 +186,14 @@ class BaseModel
 
 /*=============================== Методы создания таблиц и Базы Данных =========================*/
 	
-	//
+	// Удалить таблицу с Покупками
 	public static function dropBuy()
 	{
 		$sql = "DROP TABLE `Buy`";
 		$result = self::$pdo->query($sql);
 	}
 
-	//
+	// Удалить таблицу с Днями покупок
 	public static function dropDay()
 	{
 		$sql = "DROP TABLE `Day`";
@@ -196,7 +201,7 @@ class BaseModel
 	}
 
 
-	// Таблица Покупок связь M::1 с таблицей Day по полю day
+	// Создать таблицу Покупок связь M::1 с таблицей Day по полю day
 	public static function createBuy()
 	{
 		$result = self::$pdo->query(
@@ -217,7 +222,7 @@ class BaseModel
 
 
 
-	// Таблица Дней связь 1::M по отношению к таблице Buy по полю day
+	// Создать таблица Дней связь 1::M по отношению к таблице Buy по полю day
 	public static function createDay()
 	{
 		$result = self::$pdo->query(
@@ -236,11 +241,6 @@ class BaseModel
 	}
 
 
-	/*
-	ALTER TABLE Day ADD COLUMN all_price INT(10) NOT NULL AFTER day;
-	"SELECT all_price FROM `Day` WHERE all_price != 0 " Выборка где не равно = 0
-	*/
-
 	/* Выборка всех цен за все даты 
 	Вызвать метод countAverage 
 	ввернуть результат*/
@@ -256,9 +256,6 @@ class BaseModel
 			$array[] = $row[0];
 			$count ++;
 		}
-		//self::d($array);
-		//var_dump($array);
-
 		if ($array == null) {
 			return 0; 
 		}else{
@@ -375,45 +372,6 @@ class BaseModel
 
 
 
-
-
-	/* Удаление записи из таблицы Buy, и перерасчет поля price для таблицы Day 
-	Данный метод является обертко для метода preDelete а не delete как у метода insertBuy */
-	public static function deleteBuy($post)
-	{
-		/**/
-		BaseModel::connection();
-		$sql = self::preDelete($post);
-		var_dump($sql);
-		//$result = self::$pdo->exec($sql);
-		//return ['sql' => $sql, 'result' => $result];
-		/**/
-		
-		die();
-
-		$day = $_POST['day'];
-		$sql = "SELECT * FROM `Buy` WHERE day = '{$day}'";
-		$count = 0;
-		$result = self::$pdo->query($sql);
-		while ($row = $result->fetch(\PDO::FETCH_ASSOC)) 
-		{
-			$array[] = $row;
-			$count += $row['price'];
-		}
-
-		//self::delete($post);// Удаляю запись из таблицы Buy
-
-		echo "<hr>";
-		echo $sql;
-		echo "<hr>";
-		self::d($array);
-		echo "<hr>";
-		echo $count;
-		echo "<hr>";
-	}
-
-
-
 	/*================== МЕТОДЫ СИСТЕМЫ CRUD Insert/Selet/Delete/Update ===============*/
 	// Конструктор запросов для типа INSERT
 	public static function insert($post)
@@ -427,8 +385,6 @@ class BaseModel
 	// Внести данные в Любую таблицу 
 	protected static function preInsert($post)
 	{
-
-		//var_dump($post['table']);
 		$fields = self::getFields($post['table']);
 		$sql = "INSERT INTO `{$post['table']}` (";
 		$count = count($fields);
@@ -616,7 +572,6 @@ class BaseModel
 			
 			$sql .= " ;";
 		}
-
 
 		return $sql;
 	}

@@ -2,12 +2,14 @@
 <p>В поля введите те значения по которым будет вестись поиск записей, 
 галачками нужно отметить какие именно поля должны быть выбраны из записей.</p>
 
+<!-- html Форма выбора данных для выведения в Excel файл  -->
 <form action="" method="post">
 	<input type="hidden" name="action" value="select">
 	<input type="hidden" name="table" value="Buy">
 
 	<h4>Выбрать данные из таблицы Покупки</h4>
 
+	<!-- Можно просто выбрать все что есть -->
 	<p><label for="type_select">Выбрать </label>
 	<select name="type_select" >
 		<option></option>
@@ -15,43 +17,49 @@
 	</select>
 	</p>
 
+	<!-- Выбрать по номеру id в самой таблице -->
 	<p>
 		<label for="id">Номер </label><br>
 		<input type="text" name="id" value="" >
 		<input type='checkbox' name="select_id" value="id" class='checkbox'>
 	</p>
 
+	<!-- Выбрать по дате -->
 	<p>
 		<label for="day">Введите день в формате (2019-7-12)</label><br>
 		<input type="text" name="day" value="" >
 		<input type='checkbox' name="select_day" value="day" class='checkbox'>
 	</p>
 
+	<!-- По названию покупки -->
 	<p>
 		<label for="name">Название покупки </label><br>
 		<input type="text" name="name">
 		<input type='checkbox' name="select_name" value="name" class='checkbox'>
 	</p>
 
+	<!-- По цене -->
 	<p>
 		<label for="price">Цена </label><br>
 		<input type="text" name="price">
 		<input type='checkbox' name="select_price" value="price" class='checkbox'>
 	</p>
 
+	<!-- По количеству -->
 	<p>
 		<label for="count">Количество </label><br>
 		<input type="text" name="count">
 		<input type='checkbox' name="select_count" value="count" class='checkbox'>
 	</p>
 
+	<!-- По месту покупки -->
 	<p>
 		<label for="place">Место покупки </label><br>
 		<input type="text" name="place">
 		<input type='checkbox' name="select_place" value="place" class='checkbox'>
 	</p>
 
-
+	<!-- Покупка стоила того ? -->
 	<p>
 		<label for="expenditure">Это стоило покупать ?</label>
 		<input type='checkbox' name="select_expenditure" value="expenditure" class='checkbox'></p>
@@ -60,9 +68,6 @@
 			<option>yes</option>
 			<option>no</option>
 		</select><br>
-
-		
-		
 	</p>
 
 
@@ -85,6 +90,7 @@
 
 
 <style>
+/* Стили для формы */
 :-moz-placeholder {
     color: #7e7e7e;
 }

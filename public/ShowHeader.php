@@ -1,3 +1,4 @@
+<!-- Меню для выбора SQL запроса к БД -->
 <ul>
 	<li><a href="index.php?method=Show&action=getAllFromBuy">Выбрать все из таблицы "Покупки"</a></li>
 

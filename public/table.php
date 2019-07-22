@@ -1,4 +1,4 @@
-
+<!-- В цикле вывести результат SQL запроса к БД с полями -->
 <div>
 	<table>
 		<tr>
@@ -29,7 +29,7 @@
 
 
 <style type="text/css">
-
+/* Стили CSS для отображения таблицы */
 table {
 font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 font-size: 14px;

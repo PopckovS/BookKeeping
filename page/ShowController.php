@@ -6,6 +6,7 @@ use core\BaseModel;
 use libs\Errors;
 use core\ForExcel;
 
+// Контроллер для отображения основных методов по работе с БД
 class ShowController
 {
 
@@ -19,7 +20,7 @@ class ShowController
 
 	}
 
-
+	// Если форма была отправлена то данный метод создает Excel файл, исполняет запрос к БД и отображает результат запроса
 	public function selectAction()
 	{
 		require_once 'public/show/BuySelect.php';
@@ -30,7 +31,6 @@ class ShowController
 			extract($result);
 			$countFields = count($fields);
 
-
 			getExcel($mass);// Функция вывода данных в файл
 
 			/* Подключение вывода запрошенных данных результатов в виде таблицы*/
@@ -39,7 +39,7 @@ class ShowController
 	}
 
 
-	/* Выбрать все из таблицы Покупки */
+	/* Выбрать все из таблицы Покупки, сформировать файл Excel и отобразить результат */
 	public function getAllFromBuyAction()
 	{
 		$sql = 'SELECT * FROM `Buy`';
@@ -53,7 +53,7 @@ class ShowController
 	}
 
 
-	/* Выбрать все из таблицы Дни */
+	/* Выбрать все из таблицы Дни, сформировать файл Excel и отобразить результат */
 	public function getAllFromDayAction()
 	{
 		$sql = 'SELECT * FROM `Day`';

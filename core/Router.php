@@ -2,6 +2,7 @@
 
 namespace core;
 
+/* Класс Роутера определяет какую страницу отобразить при данном URL запросе */
 class Router
 {
 	// ТУТ ! надо указвать именно обратн слеш иначе класс неподключ и нейпрйодет проверку на существованив в функции finedController
@@ -13,7 +14,8 @@ class Router
 	public static function dispatch($param)
 	{
 		self::$param = self::splitArray($param);
-		
+
+		// Вызвать нужный контроллер
 		if (isset(self::$param['method'])) 
 		{
 			$controller = self::finedController(self::$param['method']);
@@ -24,10 +26,11 @@ class Router
 			$obj->$action();
 			
 		}else{
-			header('Location:index.php?method=main');
+			header('Location:index.php?method=main');// Если запрос некорректен то отправить на главную страницу
 		}
 	}
 
+	// Метод нахходит Дествие(Метод) Котроллера
 	private static function finedAction($controller, $action)
 	{
 		unset(self::$param['action']);
@@ -43,6 +46,7 @@ class Router
 		}
 	}
 
+	// Метод находит Контроллер
 	private static function finedController($controller)
 	{
 		unset(self::$param['method']);
@@ -70,6 +74,7 @@ class Router
 		return lcfirst($name);
 	}
 
+	// Разбивает URL запрос на Ассоуиативный Массив 
 	private static function splitArray(string $gets)
 	{
 		$array = explode("&", $gets);
@@ -81,6 +86,7 @@ class Router
 		return $result;
 	}
 
+	// Вывести содержимое Массива в удобночитаемом виде
 	private static function d($array)
 	{
 		echo "<pre>".print_r($array,1)."</pre>";

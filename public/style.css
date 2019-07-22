@@ -7,32 +7,6 @@ html{
   padding: 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .result{
   border-radius: 8px;
   background-color: white;
@@ -85,22 +59,7 @@ border-right: none;
 }
 
 
-
-
 /*========================== СТИЛИ ДЛЯ ФОРМЫ ==============================*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* №1 Выпадающее меню с Анимацией */
 nav {
@@ -135,8 +94,6 @@ nav > ul > li:hover {
 nav ul a{
  text-decoration:none;
 }
-
-
 
 ul.drop-menu {
   position: absolute;
